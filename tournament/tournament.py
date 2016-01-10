@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# 
+#
 # tournament.py -- implementation of a Swiss-system tournament
 #
 
@@ -10,12 +10,11 @@ def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
     return psycopg2.connect("dbname=tournament")
 
-
 def deleteMatches():
     """Remove all the match records from the database."""
     con= connect()
     cur = con.cursor()
-    sql="DELETE FROM Matches"
+    sql="delete from matches;"
     cur.execute(sql)
     con.commit()
     con.close()
@@ -24,42 +23,41 @@ def deletePlayers():
     """Remove all the player records from the database."""
     con= connect()
     cur = con.cursor()
-    sql="DELETE FROM PLAYERs"
+    sql="delete from players;"
     cur.execute(sql)
     con.commit()
     con.close()
-    
+
 
 
 def countPlayers():
     """Returns the number of players currently registered."""
     con= connect()
     cur = con.cursor()
-    sql="SELECT COUNT(*) FROM PLAYERS"
+    sql="select count(*) from players;"
     cur.execute(sql)
     result = cur.fetchall()
-    con.commit()
     con.close()
     return result[0][0]
 
 
 def registerPlayer(name):
     """Adds a player to the tournament database.
-  
+
     The database assigns a unique serial id number for the player.  (This
     should be handled by your SQL database schema, not in your Python code.)
-  
+
     Args:
       name: the player's full name (need not be unique).
     """
     con= connect()
     cur = con.cursor()
     name= name.replace("'", "")
-    sql="INSERT INTO PLAYERS (name, wins, matches) VALUES ('"+name+"',0,0);"
+    sql="insert into players (name, wins, matches) VALUES ('"+name+"',0,0);"
     cur.execute(sql)
     con.commit()
     con.close()
-    
+
 
 
 def playerStandings():
@@ -77,7 +75,7 @@ def playerStandings():
     """
     con= connect()
     cur = con.cursor()
-    sql="SELECT * FROM PLAYERS"
+    sql="select * from players"
     cur.execute(sql)
     result= cur.fetchall()
     con.commit()
@@ -93,33 +91,33 @@ def reportMatch(winner, loser):
     """
     con= connect()
     cur = con.cursor()
-    sql="INSERT INTO MATCHES (WINNER, LOSER) VALUES ("+str(winner)+", "+str(loser)+")"
+    sql="insert into matches (winner, loser) values ("+str(winner)+", "+str(loser)+");"
     cur.execute(sql)
-    sql="SELECT WINS, MATCHES FROM PLAYERS WHERE ID ="+str(winner)
+    sql="select wins, matches from players where id ="+str(winner)+";"
     cur.execute(sql)
     result = cur.fetchall()[0]
     wins= result[0] +1
     matches= result[1] + 1
-    sql="UPDATE Players SET WINS="+str(wins)+", MATCHES="+str(matches)+" WHERE ID="+str(winner)
+    sql="update players set wins="+str(wins)+", matches="+str(matches)+" where id="+str(winner)+";"
     cur.execute(sql)
-    sql="SELECT MATCHES FROM PLAYERS WHERE ID ="+str(loser)
+    sql="select matches from players where id ="+str(loser)+";"
     cur.execute(sql)
     result = cur.fetchall()[0]
     matches= result[0]+1
-    sql="UPDATE Players SET MATCHES="+str(matches)+" WHERE ID="+str(loser)
+    sql="update players set matches="+str(matches)+" where id="+str(loser)+";"
     cur.execute(sql)
     con.commit()
     con.close()
-     
- 
+
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
-  
+
     Assuming that there are an even number of players registered, each player
     appears exactly once in the pairings.  Each player is paired with another
     player with an equal or nearly-equal win record, that is, a player adjacent
     to him or her in the standings.
-  
+
     Returns:
       A list of tuples, each of which contains (id1, name1, id2, name2)
         id1: the first player's unique id
@@ -133,7 +131,7 @@ def swissPairings():
     que = []
     pairs=[]
     for i in range(max_number):
-        sql="SELECT id, name FROM Players where Wins="+str(i)
+        sql="select id, name from players where wins="+str(i)+";"
         cur.execute(sql)
         result = cur.fetchall()
         for row in result:
@@ -142,8 +140,7 @@ def swissPairings():
             else:
                 pairs.append((row[0],row[1],que[0][0],que[0][1],))
                 que=[]
-        
+
     con.commit()
     con.close()
     return pairs
-

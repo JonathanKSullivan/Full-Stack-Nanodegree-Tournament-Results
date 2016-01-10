@@ -7,13 +7,17 @@
 -- these lines here.
 
 
-CREATE TABLE restaurants(
-   ID INT PRIMARY KEY     NOT NULL,
-   NAME           TEXT    NOT NULL,
+CREATE DATABASE tournament;
+\c tournament
+CREATE TABLE players  (
+   id         SERIAL    NOT NULL,
+   name       TEXT    NOT NULL,
+   wins       INT    NOT NULL,
+   matches    INT   NOT NULL
 );
 
-CREATE TABLE Match(
-   ID INT PRIMARY KEY     NOT NULL,
-   WINNERID       TEXT    NOT NULL,
-   LOSERID        TEXT    NOT NULL,
+CREATE TABLE matches  (
+   id           SERIAL     NOT NULL,
+   winner       INT    NOT NULL,
+   loser        INT    NOT NULL
 );
